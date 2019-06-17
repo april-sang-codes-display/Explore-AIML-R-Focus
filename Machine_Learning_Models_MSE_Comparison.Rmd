@@ -1,0 +1,113 @@
+---
+title: "MLModels"
+author: "April Sang"
+date: "16/06/2019"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##### -
+##### Regression Model
+```{r}
+#regression model
+winequality <- read.csv('winequality-red.csv', header = T, sep = ";")
+winequality
+
+#linear model
+winelm <- lm(quality~.,data=winequality)
+ws<-summary(winelm)
+ws
+mean(ws$residuals^2)
+#MSE:0.4167
+```
+##### -
+##### Regression Tree
+```{r}
+#tree
+library(tree)
+winetree <- tree(quality~., data=winequality)
+winetree
+
+plot(winetree)
+text(winetree)
+cv.winequalityt <- cv.tree (winetree, FUN = prune.tree)
+plot(cv.winequalityt, type="b")
+#no pruning
+
+trainindex <- sample(1: nrow(winequality),800)
+winetrain <- winequality[trainindex,]
+winetest <- winequality[-trainindex,]
+
+yhat <- predict(winetree,winetest[,-12])
+mean((yhat - winetest[,12])^2)
+#MSE:0.4108023
+```
+##### -
+##### RandomForest
+```{r}
+#randomForest
+library(randomForest)
+wineRF <- randomForest(quality~., data=winequality, mtry=2,importance=TRUE)
+wineRF
+#MSE:0.3191
+```
+##### -
+##### Boosting with loovc
+```{r}
+#boosting with loovc
+attach(winequality)
+library(gbm)
+winequalityboost <- gbm(quality~., distribution="gaussian", data=winequality, n.trees=5000, interaction.depth=1)
+
+cvboost <- NA
+for(i in 1:nrow(winequality))
+  {
+dummod <- gbm(quality~., distribution="gaussian", data=winequality[-i,], n.trees=5000, interaction.depth=1)
+
+cvboost[i] <- ((predict(dummod, n.trees=5000, newdata=winequality[i,], type="response"))- quality[i]) ^2 
+}
+mean(cvboost)
+#MSE:0.434
+```
+##### -
+##### Lasso
+```{r}
+#Lasso
+#install.packages("glmnet")
+library(glmnet)
+grid <- exp(seq(10, -6, length=100))
+x <- as.matrix(winequality[,-12])
+y <- winequality$quality
+lasim <- cv.glmnet(x, y, alpha=1,lambda=grid)
+
+plot(lasim$glmnet.fit, label=TRUE, xvar="lambda")
+plot(lasim)
+lammin <- lasim$lambda.min
+lam1se <- lasim$lambda.1se
+lammin
+mse <- lasim$cvm[lasim$lambda ==lasim$lambda.min]
+mse
+#MSE: 0.424354
+```
+##### -
+##### ridge regression
+```{r}
+rrsim_d <- cv.glmnet(x, y, alpha=0)
+plot(rrsim_d$glmnet.fit, label=TRUE, xvar="lambda")
+plot(rrsim_d)
+mse_r <- rrsim_d$cvm[rrsim_d$lambda ==rrsim_d$lambda.min]
+mse_r
+#MSE: 0.4241866
+```
+
+```{r}
+winebag <- randomForest(quality~., data=winequality,mtry=11,importance=TRUE)
+winebag
+#MSE:0.3168
+```
+```
+Out of all the mothods I ran, bagging seems to be the one has the lowest MSE in the long run. 
+For presenting to the company, I would choose lasso because it is easier to expalin to people who do not have too much knowledge on stats, and the MSE of it is not way to high either. 
+```
