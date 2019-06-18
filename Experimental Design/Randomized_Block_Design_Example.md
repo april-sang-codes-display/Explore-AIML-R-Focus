@@ -7,12 +7,11 @@ April Sang
 
   - A company wants to replace some software.
 
-They have four choices (we’ll call them A-D). The selection team
-conducted a trial to compare the four products. They selected 6
-different tasks and chose 24 employees to the tasks in groups of 4 at
-random. Within each group, one employee used each product to complete
-the task. We’ll focus on the timee taken to complete the task. (The data
-are available on Learn as ‘RBDProducts.csv’.)
+They have four choices (A-D). The selection team conducted a trial to
+compare the four products. They selected 6 different tasks and chose 24
+employees to the tasks in groups of 4 at random. Within each group, one
+employee used each product to complete the task. We’ll focus on the
+timee taken to complete the task.
 
 ``` r
 RBD <- read.csv('RBDProducts.csv')
@@ -47,7 +46,7 @@ tapply(RBD$time, RBD$task, mean)
     ##      1      2      3      4      5      6 
     ##  7.075 14.500 11.450 13.500  8.050  8.475
 
-boxplot\!
+boxplot
 
 ``` r
 par(mfrow=c(1,2))
@@ -232,7 +231,7 @@ print(round(temp, 3), na.print="" )
     ## Task       5 190.943  38.189               
     ## Residuals 15  23.820   1.588
 
-The anova test:
+The ANOVA test:
 
 ``` r
 summary(aov(time ~ brand + as.factor(task), data = RBD))

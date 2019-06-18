@@ -1,7 +1,23 @@
-ExperimentalDesign-Unbalanced ANOVA
+Completely Randomized Designs-Unbalanced ANOVA
 ================
 April Sang
 16/06/2019
+
+#### Completely Randomized Designs-Unbalanced ANOVA
+
+    We are studying the impact on the level of milk protein from three different diets barley, barley + lupins, and lupins). 
+    
+    Data: Measurements of milk protein levels for 1337 samples.
+    
+    - Response: Milk Protein Level
+    
+    - Factor: DIET
+    
+    - Factor levels: k=3
+    
+        + Barley,
+        + Barley + Lupins, and
+        + Lupins
 
 ``` r
 Milk <- read.csv("Milk19.csv")
@@ -23,14 +39,6 @@ head(Milk)
     ## 6    4.06 B10 barley
 
 ``` r
-summary(Milk$Diet)
-```
-
-    ##        barley barley+lupins        lupins 
-    ##            13            14            14
-
-``` r
-## ------------------------------------------------------------------------
 round(tapply(Milk$protein,Milk$Diet,mean),2)
 ```
 
@@ -52,15 +60,15 @@ round(tapply(Milk$protein,Milk$Diet, sd),2)
     ##          0.35          0.26          0.32
 
 ``` r
-## ---- fig.width=6, fig.height=4------------------------------------------
-boxcol = c(adjustcolor("red", 0.8), adjustcolor("magenta", 0.8), adjustcolor("blue", 0.8) )
+## boxplot per group ------------------------------------------
+boxcol = c(adjustcolor("red", 0.8), adjustcolor("magenta", 0.8), adjustcolor("blue", 0.8))
 boxplot(protein~Diet, data=Milk, col=boxcol)
 ```
 
 ![](ExperimentalDesign-Unbalanced_ANOVA_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
-## ---- fig.width=4, fig.height=4------------------------------------------
+## The quantile plot ------------------------------------------
 barley        = Milk$protein[Milk$Diet == "barley"] 
 barley.lupins = Milk$protein[Milk$Diet == "barley+lupins"] 
 lupins        = Milk$protein[Milk$Diet == "lupins"] 
@@ -85,7 +93,7 @@ ggplot(Milk, aes(x=protein, color=Diet, fill=Diet)) +
 ![](ExperimentalDesign-Unbalanced_ANOVA_files/figure-gfm/unnamed-chunk-2-3.png)<!-- -->
 
 ``` r
-## ------------------------------------------------------------------------
+## The assumption of equal variances can be tested more formally using Levene's Test.
 library(car)
 ```
 
@@ -102,6 +110,8 @@ leveneTest(protein~Diet, data=Milk, center='mean')
 
 ``` r
 ## ------------------------------------------------------------------------
+
+# ANOVA F-test
 summary(aov(protein~Diet,data=Milk))
 ```
 
@@ -112,32 +122,21 @@ summary(aov(protein~Diet,data=Milk))
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ``` r
-## ------------------------------------------------------------------------
 qf(0.95, df1=2, df2=38)
 ```
 
     ## [1] 3.244818
 
 ``` r
-## ------------------------------------------------------------------------
-1-pf(6.525, df1=2, df2=38)
+## This gives the critical value at the 95% significance level for an F distribution with 2 and 38 degrees of freedom. We could change the 95% significance to 99% by changing the .95 to .99, or (if we were analyzing a different data set) use different degrees of freedom by changing the numbers specified by df1 and df2. 
 ```
 
-    ## [1] 0.003664115
-
 ``` r
-pf(6.525, df1=2, df2=38, lower.tail=FALSE)
-```
-
-    ## [1] 0.003664115
-
-``` r
-## ---- fig.width=6, fig.height=4------------------------------------------
-boxcol = c(adjustcolor("red", 0.8), adjustcolor("magenta", 0.8), adjustcolor("blue", 0.8) )
+boxcol = c(adjustcolor("red", 0.8), adjustcolor("magenta", 0.8), adjustcolor("blue", 0.8))
 boxplot(protein~Diet, data=Milk, col=boxcol)
 ```
 
-![](ExperimentalDesign-Unbalanced_ANOVA_files/figure-gfm/unnamed-chunk-2-4.png)<!-- -->
+![](ExperimentalDesign-Unbalanced_ANOVA_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 ## ------------------------------------------------------------------------
@@ -148,7 +147,10 @@ round(tapply(Milk$protein,Milk$Diet,mean),2)
     ##          3.64          3.40          3.21
 
 ``` r
-## ------------------------------------------------------------------------
+#This compares the treatment effect 2 to the average of treatment one and two. 
+#This compares the effect from barley+lupins to the average of using barley or lupins. 
+#The treatment barley+lupins equal amount then if this contrast is zero then the effect of  barley and lupins on milk protein show some evidence of being additive. 
+
 a = c(-1/2, 1, -1/2)
 tavg = round(tapply(Milk$protein,Milk$Diet,mean),2)
 theta.hat = sum( a * tavg)
@@ -158,26 +160,29 @@ theta.hat
     ## [1] -0.025
 
 ``` r
-## ------------------------------------------------------------------------
+#The estimate based on the data seems close to zero. 
+
+## The standard error 
 mod      = aov(protein~Diet,data=Milk)
 s2.hat   = sum(mod$residuals^2)/mod$df.residual 
 r        = table(Milk$Diet)
-se.theta = round(sqrt( s2.hat* sum(a^2/r)  ),3)
+se.theta = round(sqrt(s2.hat* sum(a^2/r)),3)
 se.theta
 ```
 
     ## [1] 0.103
 
 ``` r
-## ------------------------------------------------------------------------
-cval = round(qt( 0.975, df= mod$df.residual ),3)
+#The estimate based on the data seems close to zero. 
+
+## A 95% confidence interval for the contrast is 
+cval = round(qt(0.975, df= mod$df.residual),3)
 round(theta.hat + c(-1,+1)*se.theta* cval,3)
 ```
 
     ## [1] -0.233  0.183
 
 ``` r
-## ------------------------------------------------------------------------
 t.obs     = theta.hat/se.theta
 round(2*pt( abs(t.obs), df= mod$df.residual, lower.tail=FALSE),7)
 ```
@@ -185,8 +190,8 @@ round(2*pt( abs(t.obs), df= mod$df.residual, lower.tail=FALSE),7)
     ## [1] 0.8095289
 
 ``` r
-## ------------------------------------------------------------------------
-round(2*pnorm( abs(t.obs), lower.tail=FALSE),7)
+## calculate the p-value
+round(2*pt(abs(t.obs), df= mod$df.residual, lower.tail=FALSE),7)
 ```
 
-    ## [1] 0.8082235
+    ## [1] 0.8095289

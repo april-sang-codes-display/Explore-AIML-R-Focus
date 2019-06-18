@@ -3,11 +3,12 @@ Two Treatments
 April Sang
 17/06/2019
 
-### Comparing Two Treatments
+### Experimental Plans-Comparing Two Treatments
 
 ``` r
-# read in the data
+#The dataset contains information on a sample of 100 movies.
 Movies <- read.csv('filmdata.csv')
+
 # create new good/bad variable
 Movies$quality <- 'good'
 Movies$quality[Movies$rating < 2.5] <- 'bad'
