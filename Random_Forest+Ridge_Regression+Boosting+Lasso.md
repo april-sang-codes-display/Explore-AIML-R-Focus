@@ -61,14 +61,14 @@ plot(winetree)
 text(winetree)
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
 cv.winequalityt <- cv.tree (winetree, FUN = prune.tree)
 plot(cv.winequalityt, type="b")
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
 
 ``` r
 #no pruning
@@ -81,7 +81,7 @@ yhat <- predict(winetree,winetest[,-12])
 mean((yhat - winetest[,12])^2)
 ```
 
-    ## [1] 0.4170626
+    ## [1] 0.4183862
 
 ``` r
 #MSE:0.4108023
@@ -108,8 +108,8 @@ wineRF
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 2
     ## 
-    ##           Mean of squared residuals: 0.3177852
-    ##                     % Var explained: 51.24
+    ##           Mean of squared residuals: 0.3214148
+    ##                     % Var explained: 50.69
 
 ``` r
 #MSE:0.3191
@@ -137,7 +137,7 @@ cvboost[i] <- ((predict(dummod, n.trees=5000, newdata=winequality[i,], type="res
 mean(cvboost)
 ```
 
-    ## [1] 0.4320113
+    ## [1] 0.4291804
 
 ``` r
 #MSE:0.434
@@ -164,13 +164,13 @@ lasim <- cv.glmnet(x, y, alpha=1,lambda=grid)
 plot(lasim$glmnet.fit, label=TRUE, xvar="lambda")
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 plot(lasim)
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
 ``` r
 lammin <- lasim$lambda.min
@@ -178,14 +178,14 @@ lam1se <- lasim$lambda.1se
 lammin
 ```
 
-    ## [1] 0.009031194
+    ## [1] 0.007683448
 
 ``` r
 mse <- lasim$cvm[lasim$lambda ==lasim$lambda.min]
 mse
 ```
 
-    ## [1] 0.4258032
+    ## [1] 0.4247248
 
 ``` r
 #MSE: 0.424354
@@ -197,20 +197,20 @@ rrsim_d <- cv.glmnet(x, y, alpha=0)
 plot(rrsim_d$glmnet.fit, label=TRUE, xvar="lambda")
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 plot(rrsim_d)
 ```
 
-![](Untitled_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](Random_Forest+Ridge_Regression+Boosting+Lasso_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ``` r
 mse_r <- rrsim_d$cvm[rrsim_d$lambda ==rrsim_d$lambda.min]
 mse_r
 ```
 
-    ## [1] 0.4242653
+    ## [1] 0.4236019
 
 ``` r
 #MSE: 0.4241866
