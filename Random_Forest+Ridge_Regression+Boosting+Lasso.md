@@ -1,7 +1,5 @@
 Random Forest + Ridge Regression + Boosting + Lasso
 ================
-April Sang
-09/08/2019
 
 ``` r
 #regression model
