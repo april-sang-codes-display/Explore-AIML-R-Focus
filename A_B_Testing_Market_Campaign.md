@@ -1,7 +1,5 @@
-A/B Testing
+A/B Testing for A Marketing Campaign
 ================
-April Sang
-12/06/2019
 
 ``` r
 library (bayesAB)
